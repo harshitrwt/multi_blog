@@ -8,7 +8,23 @@ export const posts = pgTable("posts", {
   published: boolean("published").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  categoryId: serial("category_id")
+    .notNull()
+    .references(() => categories.id),
 });
+
+
+// import { pgTable, serial, varchar, text, timestamp, boolean } from "drizzle-orm/pg-core";
+
+// export const posts = pgTable("posts", {
+//   id: serial("id").primaryKey(),
+//   title: varchar("title", { length: 255 }).notNull(),
+//   slug: varchar("slug", { length: 255 }).notNull().unique(),
+//   content: text("content").notNull(),
+//   published: boolean("published").default(false),
+//   createdAt: timestamp("created_at").defaultNow().notNull(),
+//   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+// });
 
 export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),

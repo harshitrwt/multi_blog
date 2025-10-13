@@ -8,5 +8,4 @@ export const t = initTRPC.context<typeof createContext>().create({
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
-// We’ll define createContext next
 import { createContext } from "./context";
