@@ -16,13 +16,8 @@ export default function DashboardPage() {
     const [categoryDescription, setCategoryDescription] = useState('');
 
     const utils = trpc.useUtils();
-
-    // Queries to fetch current data
     const { data: categories } = trpc.category.getAll.useQuery();
     const { data: posts } = trpc.post.getAll.useQuery();
-    // Optional: could fetch post-category assignments per post if desired
-
-    // Mutation to create category
     const createCategory = trpc.category.create.useMutation({
         onSuccess: () => {
             utils.category.getAll.invalidate();
@@ -32,7 +27,6 @@ export default function DashboardPage() {
         },
     });
 
-    // Mutation to create post-category assignment
     const assignCategory = trpc.postCategory.assign.useMutation({
         onSuccess: () => {
             utils.postCategory.getByPost.invalidate();
@@ -40,21 +34,16 @@ export default function DashboardPage() {
         },
     });
 
-    // Create post mutation (returns post including id)
+    
     const createPost = trpc.post.create.useMutation({
-        onSuccess: (newPost) => {
+        onSuccess: () => {
             utils.post.getAll.invalidate();
             setTitle('');
             setContent('');
             setSlug('');
-            if (selectedCategory && newPost?.id) {
-                assignCategory.mutate({
-                    postId: newPost.id,
-                    categoryId: selectedCategory,
-                });
-            }
         },
     });
+
 
     return (
         <div className="p-8">
@@ -144,9 +133,10 @@ export default function DashboardPage() {
                         title,
                         content,
                         slug,
-                        published: true,
+                        categoryId: selectedCategory,
                     })
                 }
+
                 disabled={
                     createPost.status === 'pending' ||
                     !title ||

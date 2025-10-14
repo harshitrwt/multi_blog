@@ -55,4 +55,29 @@ export const postRouter = router({
       });
       return { success: true };
     }),
+
+
+    getBySlug: publicProcedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.db.query.posts.findFirst({
+        where: eq(posts.slug, input.slug),
+        with: {
+          postCategories: {
+            with: {
+              category: true,
+            },
+          },
+        },
+      }) as any;
+
+      if (!post) return null;
+
+      const category = post.postCategories?.[0]?.category || null;
+
+      return {
+        ...post,
+        category,
+      };
+    }),
 });

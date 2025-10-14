@@ -37,4 +37,29 @@ export const categoryRouter = router({
         where: (category) => eq(category.id, input.id),
       });
     }),
+
+  getBySlug: publicProcedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const category = await ctx.db.query.categories.findFirst({
+        where: eq(categories.slug, input.slug),
+        with: {
+          postCategories: {
+            with: {
+              post: true,
+            },
+          },
+        },
+      }) as any;
+
+      if (!category) return null;
+
+      const postsList = category.postCategories.map((pc:any) => pc.post);
+
+      return {
+        ...category,
+        posts: postsList,
+      };
+    }),
 });
+

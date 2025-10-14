@@ -36,7 +36,7 @@ export function PostCard({ posts }: { posts: any[] }) {
 
       <div className="mt-10 text-center">
         <Link
-          href="/more-posts"
+          href="/user"
           className={`${buttonVariants({ size: "lg" })} bg-blue-600 text-white px-6 py-3 hover:bg-blue-700 transition`}
         >
           More Posts
