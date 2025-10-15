@@ -7,14 +7,16 @@ CREATE TABLE "categories" (
 );
 --> statement-breakpoint
 CREATE TABLE "post_categories" (
-	"post_id" serial NOT NULL,
-	"category_id" serial NOT NULL
+	"id" serial PRIMARY KEY NOT NULL,
+	"post_id" integer NOT NULL,
+	"category_id" integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "posts" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"slug" varchar(255) NOT NULL,
+	"cover_image" varchar(500),
 	"content" text NOT NULL,
 	"published" boolean DEFAULT false,
 	"created_at" timestamp DEFAULT now() NOT NULL,

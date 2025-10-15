@@ -16,7 +16,7 @@ export const postCategoryRouter = router({
     .query(async ({ input, ctx }) => {
       return await ctx.db.query.postCategories.findMany({
         where: eq(postCategories.postId, input.postId),
-        with: { categories: true },
+        with: { category: true },
       });
     }),
 

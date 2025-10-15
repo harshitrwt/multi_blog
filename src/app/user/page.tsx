@@ -34,7 +34,6 @@ export default function UserPage() {
   const { user } = useUser();
   const { posts, isLoading } = usePosts();
 
-  // Generate fixed emoji positions once (on mount)
   const [emojiPositions] = useState(() => {
     const emojis = ["📝", "✍️", "📖", "📰", "📚"];
     return Array.from({ length: 5 }).map((_, idx) => {
@@ -42,7 +41,7 @@ export default function UserPage() {
         emoji: emojis[idx % emojis.length],
         top: Math.random() * 80 + 10 + "vh",
         left: Math.random() * 80 + 10 + "vw",
-        fontSize: `${Math.random() * 20 + 30}px`,
+        fontSize: `100px`,
         opacity: 0.1 + Math.random() * 0.2,
         rotate: `rotate(${Math.random() * 360}deg)`,
       };
@@ -78,7 +77,7 @@ export default function UserPage() {
               BlogNest
             </Link>
             <div className="flex gap-4 items-center">
-              <Link href="/dashboard" className="hover:underline">
+              <Link href="/dashboard" className="border-2 p-1 bg-blue-600 text-white hover:bg-blue-800 transition-300 rounded-lg border-white ">
                 Create Post
               </Link>
               <ModeToggle />
@@ -138,3 +137,5 @@ export default function UserPage() {
     </ThemeProvider>
   );
 }
+
+

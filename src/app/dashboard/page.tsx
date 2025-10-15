@@ -12,6 +12,7 @@ export default function DashboardPage() {
 
     // Category state
     const [categoryName, setCategoryName] = useState('');
+    const [coverImage, setCoverImage] = useState('');
     const [categorySlug, setCategorySlug] = useState('');
     const [categoryDescription, setCategoryDescription] = useState('');
 
@@ -34,7 +35,7 @@ export default function DashboardPage() {
         },
     });
 
-    
+
     const createPost = trpc.post.create.useMutation({
         onSuccess: () => {
             utils.post.getAll.invalidate();
@@ -136,9 +137,8 @@ export default function DashboardPage() {
                         categoryId: selectedCategory,
                     })
                 }
-
                 disabled={
-                    createPost.status === 'pending' ||
+                    createPost.status === "pending" ||
                     !title ||
                     !content ||
                     !slug ||
@@ -147,6 +147,7 @@ export default function DashboardPage() {
             >
                 Post
             </button>
+
 
             <h2 className="text-lg font-semibold mt-6">All Posts</h2>
             <ul>

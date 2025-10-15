@@ -7,7 +7,7 @@ import './globals.css';
 import { trpc, trpcClient } from '@/lib/trpcClient';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { ThemeProvider } from '@/components/theme-provider'; // ✅ import it here
+import { ThemeProvider } from '@/components/theme-provider'; 
 import { useState } from 'react';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });

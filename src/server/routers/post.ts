@@ -19,7 +19,7 @@ export const postRouter = router({
         categorySlug: categories.slug,
       })
       .from(posts)
-      .leftJoin(categories, eq(posts.id, categories.id)); 
+      .leftJoin(categories, eq(posts.categoryId, categories.id));
 
     return allPosts.map((p) => ({
       id: p.id,
@@ -30,10 +30,10 @@ export const postRouter = router({
       published: p.published,
       category: p.categoryName
         ? {
-            id: p.categoryId,
-            name: p.categoryName,
-            slug: p.categorySlug,
-          }
+          id: p.categoryId,
+          name: p.categoryName,
+          slug: p.categorySlug,
+        }
         : null,
     }));
   }),
@@ -46,18 +46,43 @@ export const postRouter = router({
         content: z.string(),
         categoryId: z.number().optional(),
       })
+
     )
     .mutation(async ({ input }) => {
-      await db.insert(posts).values({
-        title: input.title,
-        slug: input.slug,
-        content: input.content,
-      });
-      return { success: true };
+      const [inserted] = await db
+        .insert(posts)
+        .values({
+          title: input.title,
+          slug: input.slug,
+          categoryId: input.categoryId ?? null,
+          content: input.content,
+        })
+        .returning();
+
+      return inserted;
+    }),
+
+  update: publicProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        title: z.string(),
+        content: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { slug, title, content } = input;
+      const [updated] = await ctx.db
+        .update(posts)
+        .set({ title, content })
+        .where(eq(posts.slug, slug))
+        .returning();
+      return updated;
     }),
 
 
-    getBySlug: publicProcedure
+
+  getBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ ctx, input }) => {
       const post = await ctx.db.query.posts.findFirst({
