@@ -29,6 +29,9 @@ export default function PostPage() {
   const handleEditClick = () => {
     router.push(`/editor/${slug}`);
   };
+  const handleBackClick = () => {
+    router.push(`/`);
+  };
 
   if (isLoading) return <p className="text-center py-10">Loading post...</p>;
   if (error)
@@ -76,12 +79,18 @@ export default function PostPage() {
         <ReactMarkdown>{post.content}</ReactMarkdown>
       </div>
 
-      {/* Edit Button */}
+      
       <button
         onClick={handleEditClick}
         className="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg shadow-lg"
       >
         Edit
+      </button>
+      <button
+        onClick={handleBackClick}
+        className="fixed bottom-8 left-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg shadow-lg"
+      >
+        Back
       </button>
     </article>
   );

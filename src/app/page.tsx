@@ -8,6 +8,7 @@ import { AboutFeaturesSection } from "@/components/AbFeat";
 import { Footer } from "@/components/Footer";
 import { usePosts } from "@/hooks/usePosts";
 import { useCategories } from "@/hooks/useCategories";
+import { useUser } from "@clerk/nextjs";
 
 const LoadingSpinner = () => (
   <div role="status" className="flex items-center justify-center min-h-screen">
@@ -27,15 +28,16 @@ const LoadingSpinner = () => (
         fill="currentFill"
       />
     </svg>
-    <span className="sr-only">Loading...</span>
   </div>
 );
 
-
 export default function HomePage() {
+  const { isLoaded, isSignedIn } = useUser();
   const { posts, isLoading: loadingPosts } = usePosts();
   const { categories, isLoading: loadingCategories } = useCategories();
   const limitedPosts = posts.slice(0, 4);
+
+  if (!isLoaded) return <LoadingSpinner />;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -43,33 +45,42 @@ export default function HomePage() {
       <HeroSection />
 
       <main className="flex-1 max-w-4xl mx-auto px-4 py-10 space-y-10">
-        <section>
-          <h2 className="text-4xl font-extrabold text-center mb-10 text-blue-600 dark:text-blue-400">
-              Top Categories
-            </h2>
-          <div className="flex flex-wrap gap-2 m-auto justify-center rounded-none">
-            
-            {loadingCategories ? (
-              <LoadingSpinner />
-            ) : categories.length === 0 ? (
-              <p>No categories yet.</p>
-            ) : (
-              categories.map((c) => <CategoryBadge key={c.id} category={c} />)
-            )}
-          </div>
-        </section>
+        {!isSignedIn ? (
+          <p className="text-center text-3xl m-10 font-bold text-blue-600 dark:text-blue-400">
+            Please sign in to see posts
+          </p>
+        ) : (
+          <>
+            <section>
+              <h2 className="text-4xl font-extrabold text-center mb-10 text-blue-600 dark:text-blue-400">
+                Top Categories
+              </h2>
+              <div className="flex flex-wrap gap-2 m-auto justify-center rounded-none">
+                {loadingCategories ? (
+                  <LoadingSpinner />
+                ) : categories.length === 0 ? (
+                  <p>No categories yet.</p>
+                ) : (
+                  categories.map((c) => (
+                    <CategoryBadge key={c.id} category={c} />
+                  ))
+                )}
+              </div>
+            </section>
 
-        <section>
-          {loadingPosts ? (
-            <LoadingSpinner />
-          ) : limitedPosts.length === 0 ? (
-            <p>No posts yet.</p>
-          ) : (
-            <div className="space-y-4">
-              <PostCard posts={limitedPosts} />
-            </div>
-          )}
-        </section>
+            <section>
+              {loadingPosts ? (
+                <LoadingSpinner />
+              ) : limitedPosts.length === 0 ? (
+                <p>No posts yet.</p>
+              ) : (
+                <div className="space-y-4">
+                  <PostCard posts={limitedPosts} />
+                </div>
+              )}
+            </section>
+          </>
+        )}
       </main>
 
       <AboutFeaturesSection />

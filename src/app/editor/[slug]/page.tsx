@@ -16,8 +16,8 @@ export default function EditorPage() {
   const { data: post, isLoading } = trpc.post.getBySlug.useQuery({ slug });
 
   const updatePost = trpc.post.update.useMutation({
-    onSuccess: () => {
-      router.push(`/post/${slug}`);
+    onSuccess: (updatedPost) => {
+      router.push(`/posts/${updatedPost.slug}`);
     },
   });
 
@@ -32,23 +32,28 @@ export default function EditorPage() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto py-10 px-4">
-      <h1 className="text-2xl font-bold mb-4">Edit Post</h1>
+    <div className="max-w-5xl mb-10 mx-auto py-10 px-6 bg-white dark:bg-neutral-900 rounded-2xl shadow-lg mt-10">
+      <h1 className="text-3xl font-bold mb-6 text-center">Edit Post</h1>
 
       <input
-        className="w-full p-2 mb-4 border rounded"
+        className="w-full p-3 mb-6 border border-gray-300 dark:border-gray-700 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
         placeholder="Post Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
 
-      <MDEditor
-        value={content}
-        onChange={(value) => setContent(value || "")}
-        height={800}
-      />
+      <div data-color-mode="light" className="mb-6">
+        <MDEditor
+          value={content}
+          onChange={(value) => setContent(value || "")}
+          height={700}
+          preview="edit"
+          className="md:w-[100%] rounded-lg border border-gray-300 dark:border-gray-700 shadow-sm"
+        />
+      </div>
 
       <button
+        disabled={updatePost.isPending}
         onClick={() =>
           updatePost.mutate({
             slug,
@@ -56,10 +61,39 @@ export default function EditorPage() {
             content,
           })
         }
-        className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+        className={`mx-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 ${updatePost.isPending ? "opacity-70 cursor-not-allowed" : ""
+          }`}
       >
-        Save Changes
+        {updatePost.isPending ? (
+          <>
+            <svg
+              className="w-5 h-5 animate-spin text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+            Saving...
+          </>
+        ) : (
+          "Save Changes"
+        )}
       </button>
+
     </div>
   );
+
 }

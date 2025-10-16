@@ -23,10 +23,10 @@ export function HeroSection() {
           loaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
         }`}
       >
-        <h1 className="text-[7vh] font-extrabold mb-4 mt-18 leading-tight">
+        <h1 className="md:text-[7vh] text-[4vh] font-extrabold mb-4 mt-18 leading-tight">
           "One Thought is All it Takes 😉"
         </h1>
-        <p className="text-lg text-gray-900 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+        <p className="md:text-lg text-sm text-gray-900 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
           Write, share powerful stories across categories.<br></br> Discover inspiration and showcase your voice with ease.
         </p>
         <SignedIn>
