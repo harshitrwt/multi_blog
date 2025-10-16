@@ -1,18 +1,6 @@
 import { pgTable, serial, varchar, text, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
-// export const posts = pgTable("posts", {
-//   id: serial("id").primaryKey(),
-//   title: varchar("title", { length: 255 }).notNull(),
-//   slug: varchar("slug", { length: 255 }).notNull().unique(),
-//   coverImage: varchar("cover_image", { length: 500 }),
-//   content: text("content").notNull(),
-//   published: boolean("published").default(false),
-//   createdAt: timestamp("created_at").defaultNow().notNull(),
-//   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-//   categoryId: integer("category_id").references(() => categories.id),
-// });
-
 export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
@@ -56,3 +44,5 @@ export const postCategoriesRelations = relations(postCategories, ({ one }) => ({
     references: [categories.id],
   }),
 }));
+
+

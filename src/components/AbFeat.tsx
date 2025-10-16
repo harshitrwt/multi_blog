@@ -34,13 +34,26 @@ export function AboutFeaturesSection() {
           <p className="text-lg text-gray-700 dark:text-gray-300 mb-8 max-w-xl mx-auto md:mx-0">
             BlogNest empowers you to express yourself effortlessly. Write, share, and discover powerful stories that inspire and connect. Our platform fosters creativity and community with an intuitive interface designed for storytellers of all levels.
           </p>
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold">
-            Get Started Now
-          </Button>
+          <SignedIn>
+          <button
+            className="bg-blue-600 text-white font-bold py-3 px-10 rounded-md shadow-lg hover:bg-blue-700 transition-colors"
+            onClick={handleGetStarted}
+          >
+            Get Started
+          </button>
+        </SignedIn>
+        <SignedOut>
+          <button
+            className="bg-gray-400 cursor-not-allowed text-white font-bold py-3 px-10 rounded-full shadow-lg"
+            disabled
+          >
+            Sign In to Get Started
+          </button>
+        </SignedOut>
         </div>
 
         <div
-          className={`flex-1 max-w-md md:max-w-lg rounded-lg overflow-hidden shadow-xl transition-transform duration-700 ease-out ${
+          className={`flex-1 max-w-md md:max-w-lg rounded-lg overflow-hidden rotate-12 hover:rotate-0 shadow-lg shadow-white hover:shadow-blue-600 transition-transform duration-700 ease-out ${
             loaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
@@ -48,8 +61,8 @@ export function AboutFeaturesSection() {
             src="https://assets-cdn.wellhub.com/images/mep-cms/legacy_estee_janssens_hf5xg_X_Bfx5_Y_unsplash_scaled_e0b4a18d18.jpg?w=1024&q=70"
             alt="Blogging Inspiration"
             width={600}
-            height={400}
-            className="object rounded-lg border-4 border-blue-600 shadow-3xl shadow-white dark:shadow-white"
+            height={300}
+            className="object rounded-lg cursor-pointer border-4 border-blue-600 shadow-3xl shadow-white dark:shadow-white"
           />
         </div>
       </div>

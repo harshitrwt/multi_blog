@@ -1,24 +1,39 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { ModeToggle } from "@/components/ModeToggle";
 
+// Helper to scroll to section with id and offset
+function scrollToSection(id: string, offset: number = 0) {
+  const section = document.getElementById(id);
+  if (section) {
+    const rect = section.getBoundingClientRect();
+    window.scrollTo({
+      top: window.scrollY + rect.top + offset,
+      behavior: "smooth",
+    });
+  }
+}
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const handleScroll = (section: 'about' | 'features') => {
+    // Adjust offset based on desired scroll position for section
+    if (section === 'about') scrollToSection('about-section', -70);
+    if (section === 'features') scrollToSection('features-section', -100);
+    setIsMenuOpen(false);
+  };
 
   return (
     <nav className="relative top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white rounded-xl shadow-lg z-50 max-w-5xl w-[90%]">
       <div className="flex justify-between items-center p-4 text-base md:text-lg">
-        <Link href="/" className="text-3xl font-bold">
+        <span className="text-3xl font-bold cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
           BlogNest
-        </Link>
-        
+        </span>
         <div className="md:hidden flex items-center">
-          <button onClick={toggleMenu} className="text-white">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
@@ -26,18 +41,30 @@ export function Navbar() {
         </div>
 
         <div className="hidden md:flex gap-4 items-center">
-          <Link href="/" className="hover:underline">
+          <span
+            className="hover:underline cursor-pointer"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          >
             Home
-          </Link>
-          <Link href="/categories" className="hover:underline">
-            Categories
-          </Link>
-          <Link href="/about" className="hover:underline">
+          </span>
+          <span
+            className="hover:underline cursor-pointer"
+            onClick={() => handleScroll('features')}
+          >
+            Features
+          </span>
+          <span
+            className="hover:underline cursor-pointer"
+            onClick={() => handleScroll('about')}
+          >
             About
-          </Link>
-          <Link href="/dashboard" className="hover:underline">
+          </span>
+          <span
+            className="hover:underline cursor-pointer"
+            onClick={() => window.location.href = "/dashboard"}
+          >
             Dashboard
-          </Link>
+          </span>
 
           <ModeToggle />
 
@@ -59,21 +86,32 @@ export function Navbar() {
         </div>
       </div>
 
-      
       {isMenuOpen && (
         <div className="md:hidden bg-blue-600 p-4 absolute top-full left-0 w-full shadow-lg rounded-b-xl">
-          <Link href="/" className="block py-2 text-white hover:underline">
+          <span
+            className="block py-2 text-white hover:underline cursor-pointer"
+            onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); setIsMenuOpen(false); }}
+          >
             Home
-          </Link>
-          <Link href="/categories" className="block py-2 text-white hover:underline">
-            Categories
-          </Link>
-          <Link href="/about" className="block py-2 text-white hover:underline">
+          </span>
+          <span
+            className="block py-2 text-white hover:underline cursor-pointer"
+            onClick={() => handleScroll('features')}
+          >
+            Features
+          </span>
+          <span
+            className="block py-2 text-white hover:underline cursor-pointer"
+            onClick={() => handleScroll('about')}
+          >
             About
-          </Link>
-          <Link href="/dashboard" className="block py-2 text-white hover:underline">
+          </span>
+          <span
+            className="block py-2 text-white hover:underline cursor-pointer"
+            onClick={() => { window.location.href = "/dashboard"; setIsMenuOpen(false); }}
+          >
             Dashboard
-          </Link>
+          </span>
 
           <ModeToggle />
 
