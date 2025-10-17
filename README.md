@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BlogNest - Full-Stack Blogging Platform
 
-## Getting Started
+BlogNest is a **full-stack modern blogging application** built using **Next.js 15, TypeScript, tRPC, Drizzle ORM, Neon PostgreSQL, Clerk Authentication**, and **Zustand** for state management.  
+It allows users to create, edit, publish, and manage blog posts with rich markdown editing, category-based organization, and draft-saving functionality.
 
-First, run the development server:
+![coverpage](<WhatsApp Image 2025-10-17 at 12.17.38_95c1849d.jpg>)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Tech Stack
+
+| Layer | Technologies Used |
+|-------|-------------------|
+| **Frontend** | Next.js 14 (App Router), TypeScript, Tailwind CSS, Markdown Editor (`@uiw/react-md-editor`), TanStack Query |
+| **Backend** | tRPC, Drizzle ORM, Zod Validation |
+| **Database** | Neon PostgreSQL (serverless Postgres) |
+| **Authentication** | Clerk |
+| **State Management** | Zustand |
+| **Deployment** | Vercel (Frontend + API Routes) |
+
+---
+
+## Features
+
+1. **Markdown Editor** — Rich text creation with live preview powered by `@uiw/react-md-editor`.
+2. **Category Management** — Create and assign multiple categories to posts dynamically.
+3. **Draft & Publish Modes** — Save posts as drafts or publish instantly with toast notifications.
+4. **Filtering by Category** — View posts or drafts filtered by selected categories.
+5. **User Dashboard** — Authenticated users can create, edit, and manage posts.
+6. **Persistent Database** — Drizzle ORM schema synced with Neon PostgreSQL.
+7. **Instant Feedback** — Toast notifications for CRUD actions via Zustand.
+8. **Fully Typed API** — End-to-end type safety using tRPC and Zod.
+9. **Responsive Design** — Mobile-first UI with Tailwind CSS and a toggleable sidebar.
+
+---
+
+
+## Database Schema (Drizzle ORM)
+
+- **posts** → stores blog data (title, slug, content, published status, timestamps)
+- **categories** → stores available categories
+- **post_categories** → junction table linking posts and categories (many-to-many relationship)
+
+Example schema snippet:
+```ts
+export const posts = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").unique().notNull(),
+  content: text("content").notNull(),
+  published: boolean("published").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Installation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Clone Repository
 
-## Learn More
+```
+git clone https://github.com/yourusername/blogify.git
+cd blogNest
+```
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Install Dependencies
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```npm install```
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Setup Environment
+```
+DATABASE_URL="your-neon-postgres-url"
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your-clerk-key"
+CLERK_SECRET_KEY="your-clerk-secret"
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Generate and Run Drizzle Migrations
+
+```
+npx drizzle-kit generate
+npx drizzle-kit migrate
+```
+
+Run Development Server
+
+```npm run dev```
+
+
+Access App
+Visit → http://localhost:3000
+
+## Key Implementation Highlights
+
+- tRPC + Zod → full type-safe API communication between frontend and backend.
+
+- Zustand Store → manages sidebar visibility and toast notifications globally.
+
+- Neon PostgreSQL → serverless database for efficient Postgres hosting.
+
+- Drizzle ORM → typed query builder ensuring schema-to-code consistency.
+
+- Clerk Authentication → user identity, sign-in, and access protection for routes.
+
+- TanStack Query → seamless real-time data fetching and cache invalidation.
+
+
+## Author
+
+Developed by Harshit Rawat 
+
+
