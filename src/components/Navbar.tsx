@@ -3,31 +3,24 @@
 import { useState } from "react";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { ModeToggle } from "@/components/ModeToggle";
-
-function scrollToSection(id: string, offset: number = 0) {
-  const section = document.getElementById(id);
-  if (section) {
-    const rect = section.getBoundingClientRect();
-    window.scrollTo({
-      top: window.scrollY + rect.top + offset,
-      behavior: "smooth",
-    });
-  }
-}
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
 
-  const handleScroll = (section: 'about' | 'features') => {
-    if (section === 'about') scrollToSection('about-section', -70);
-    if (section === 'features') scrollToSection('features-section', -100);
+  const handleNavigation = (path: string) => {
+    router.push(path);
     setIsMenuOpen(false);
   };
 
   return (
     <nav className="relative top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white rounded-xl shadow-lg z-50 max-w-5xl w-[90%]">
       <div className="flex justify-between items-center p-4 text-base md:text-lg">
-        <span className="text-3xl font-bold cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+        <span
+          className="text-3xl font-bold cursor-pointer"
+          onClick={() => router.push('/')} 
+        >
           BlogNest
         </span>
         <div className="md:hidden flex items-center">
@@ -41,25 +34,25 @@ export function Navbar() {
         <div className="hidden md:flex gap-4 items-center">
           <span
             className="hover:underline cursor-pointer"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            onClick={() => router.push('/')} 
           >
             Home
           </span>
           <span
             className="hover:underline cursor-pointer"
-            onClick={() => handleScroll('features')}
+            onClick={() => handleNavigation('/features')} 
           >
             Features
           </span>
           <span
             className="hover:underline cursor-pointer"
-            onClick={() => handleScroll('about')}
+            onClick={() => handleNavigation('/about')} 
           >
             About
           </span>
           <span
             className="hover:underline cursor-pointer"
-            onClick={() => window.location.href = "/dashboard"}
+            onClick={() => router.push("/dashboard")} 
           >
             Dashboard
           </span>
@@ -88,25 +81,25 @@ export function Navbar() {
         <div className="md:hidden bg-blue-600 p-4 absolute top-full left-0 w-full shadow-lg rounded-b-xl">
           <span
             className="block py-2 text-white hover:underline cursor-pointer"
-            onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); setIsMenuOpen(false); }}
+            onClick={() => { router.push('/'); setIsMenuOpen(false); }} 
           >
             Home
           </span>
           <span
             className="block py-2 text-white hover:underline cursor-pointer"
-            onClick={() => handleScroll('features')}
+            onClick={() => { handleNavigation('/features'); }} 
           >
             Features
           </span>
           <span
             className="block py-2 text-white hover:underline cursor-pointer"
-            onClick={() => handleScroll('about')}
+            onClick={() => { handleNavigation('/about'); }} 
           >
             About
           </span>
           <span
             className="block py-2 text-white hover:underline cursor-pointer"
-            onClick={() => { window.location.href = "/dashboard"; setIsMenuOpen(false); }}
+            onClick={() => { router.push("/dashboard"); setIsMenuOpen(false); }} 
           >
             Dashboard
           </span>

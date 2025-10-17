@@ -47,18 +47,22 @@ export function HeroSection() {
         </SignedOut>
       </div>
 
-      
       <div
         className={`w-full max-w-5xl rounded-lg overflow-hidden transition-transform duration-700 ease-out ${
           loaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
         } shadow-3xl dark:shadow-[0_0_40px_rgba(255,255,255,0.2)]`}
       >
-        <img
-          src="https://img.freepik.com/free-photo/crop-woman-making-notes-near-camera-breakfast-food_23-2147911477.jpg"
-          alt="Woman making notes breakfast food"
+        <video
           className="w-full h-auto object-cover rounded-lg border-4 border-blue-600"
+          autoPlay
+          loop
+          muted
+          playsInline
           draggable={false}
-        />
+        >
+          <source src="/videos/hero.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
       </div>
     </section>
   );

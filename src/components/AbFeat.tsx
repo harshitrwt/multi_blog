@@ -58,7 +58,7 @@ export function AboutFeaturesSection() {
           }`}
         >
           <img
-            src="https://assets-cdn.wellhub.com/images/mep-cms/legacy_estee_janssens_hf5xg_X_Bfx5_Y_unsplash_scaled_e0b4a18d18.jpg?w=1024&q=70"
+            src="../image.png"
             alt="Blogging Inspiration"
             className="object rounded-xl cursor-pointer border-4 border-blue-600 shadow-3xl shadow-white dark:shadow-white"
           />
