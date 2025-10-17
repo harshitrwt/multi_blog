@@ -118,8 +118,8 @@ export default function DashboardPage() {
                       }
                     }}
                     className={`px-3 py-1 rounded-full border text-sm ${isSelected
-                        ? "bg-blue-600 text-white border-blue-600"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
                       }`}
                   >
                     {c.name}
@@ -197,8 +197,8 @@ export default function DashboardPage() {
                 !slug.trim()
               }
               className={`inline-flex items-center gap-2 px-5 py-3 rounded-lg text-white font-semibold ${createPost.status === "pending"
-                  ? "bg-blue-400 cursor-wait"
-                  : "bg-blue-600 hover:bg-blue-700"
+                ? "bg-blue-400 cursor-wait"
+                : "bg-blue-600 hover:bg-blue-700"
                 }`}
             >
               {createPost.status === "pending" ? "Saving..." : "Publish"}
@@ -207,44 +207,51 @@ export default function DashboardPage() {
         </section>
 
         <aside
-          className={`bg-white dark:bg-neutral-900 rounded-2xl p-4 shadow transition-all ${sidebarOpen ? "block" : "hidden lg:block"
-            }`}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold">Your Posts</h3>
-            <button
-              onClick={() => (sidebarOpen ? closeSidebar() : openSidebar())}
-              className="text-sm text-muted-foreground"
-            >
-              {sidebarOpen ? "Hide" : "Show"}
-            </button>
-          </div>
+  className={`bg-white dark:bg-neutral-900 rounded-2xl p-4 shadow transition-all duration-300 ${sidebarOpen ? "opacity-100 translate-x-0 w-[320px]" : "opacity-90 translate-x-0 w-8"}`}
+>
+  <div className="flex items-center justify-between mb-3">
+    
+    <h3 className={`text-lg font-semibold transition-all duration-300 ${sidebarOpen ? "opacity-100" : "opacity-0"}`}>
+      Your Posts
+    </h3>
+    
+    <button
+      onClick={() => useUIStore.getState().toggleSidebar()}
+      className={`text-sm border-1 boder-blue-600 bg-blue-600 p-2 text-white hover:underline transition-all duration-300 ${sidebarOpen ? "" : "pl-3"}`}
+      style={{ width: "max-content" }}
+    >
+      {sidebarOpen ? "Hide" : "Show"}
+    </button>
+  </div>
 
-          <div className="space-y-3 max-h-[60vh] overflow-y-auto">
-            {posts.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No posts yet.</div>
-            ) : (
-              posts.map((p: any) => (
-                <div
-                  key={p.id}
-                  className="p-3 cursor-pointer rounded-lg border hover:border-blue-600"
-                >
-                  <a href={`/posts/${p.slug}`} className="font-medium text-blue-600">
-                    {p.title}
-                  </a>
-                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                    {p.content}
-                  </div>
-                </div>
-              ))
-            )}
+  
+  <div className={`space-y-3 max-h-[60vh] overflow-y-auto transition-all duration-300 ${sidebarOpen ? "opacity-100" : "opacity-0"}`}>
+    {posts.length === 0 ? (
+      <div className="text-sm text-muted-foreground">No posts yet.</div>
+    ) : (
+      posts.map((p: any) => (
+        <div
+          key={p.id}
+          className="p-3 cursor-pointer rounded-lg border hover:border-blue-600"
+        >
+          <a href={`/posts/${p.slug}`} className="font-medium text-blue-600">
+            {p.title}
+          </a>
+          <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+            {p.content}
           </div>
-        </aside>
+        </div>
+      ))
+    )}
+  </div>
+</aside>
+
+
       </main>
 
       <Footer />
 
-   
+
       {newCategoryModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-xl w-80">
