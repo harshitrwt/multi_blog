@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { HeroSection } from "@/components/HeroSection";
 import { PostCard } from "@/components/PostCard";
@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { usePosts } from "@/hooks/usePosts";
 import { useCategories } from "@/hooks/useCategories";
 import { useUser } from "@clerk/nextjs";
+import './globals.css';
 
 const LoadingSpinner = () => (
   <div role="status" className="flex items-center justify-center min-h-screen">
@@ -43,12 +44,16 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <HeroSection />
-
       <main className="flex-1 max-w-4xl mx-auto px-4 py-10 space-y-10">
         {!isSignedIn ? (
-          <p className="text-center text-3xl m-10 font-bold text-blue-600 dark:text-blue-400">
-            Please sign in to see posts
-          </p>
+          <div className="text-center m-10 relative">
+            <div className="dots-animation absolute inset-0"></div>
+            <img
+              src="../auth.jpg"
+              alt="No posts available"
+              className="mx-auto h-full w-full md:h-56 rounded-xl relative z-10"
+            />
+          </div>
         ) : (
           <>
             <section>

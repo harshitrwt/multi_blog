@@ -30,6 +30,7 @@ export default function EditorPage() {
   }, [post, setTitle, setContent, setSlug]);
 
   if (isLoading) return <div>Loading...</div>;
+  if (!post) return <div>Post not found.</div>;
 
   return (
     <div className="max-w-5xl mb-10 mx-auto py-10 px-6 bg-white dark:bg-neutral-900 rounded-2xl shadow-lg mt-10">
@@ -52,48 +53,42 @@ export default function EditorPage() {
         />
       </div>
 
-      <button
-        disabled={updatePost.isPending}
-        onClick={() =>
-          updatePost.mutate({
-            slug,
-            title,
-            content,
-          })
-        }
-        className={`mx-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 ${updatePost.isPending ? "opacity-70 cursor-not-allowed" : ""
-          }`}
-      >
-        {updatePost.isPending ? (
-          <>
-            <svg
-              className="w-5 h-5 animate-spin text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              ></path>
-            </svg>
-            Saving...
-          </>
-        ) : (
-          "Save Changes"
-        )}
-      </button>
+      <div className="flex justify-center gap-4 mt-6">
+  <button
+    disabled={updatePost.isPending}
+    onClick={() =>
+      updatePost.mutate({
+        id: post.id,
+        slug,
+        title,
+        content,
+        published: false,
+        categoryIds: post.categories?.map((c: any) => c.id) || [],
+      })
+    }
+    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-8 py-3 rounded-lg"
+  >
+    {updatePost.isPending ? "Saving..." : "Save Draft"}
+  </button>
+
+  <button
+    disabled={updatePost.isPending}
+    onClick={() =>
+      updatePost.mutate({
+        id: post.id,
+        slug,
+        title,
+        content,
+        published: true,
+        categoryIds: post.categories?.map((c: any) => c.id) || [],
+      })
+    }
+    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg"
+  >
+    {updatePost.isPending ? "Publishing..." : "Publish"}
+  </button>
+</div>
 
     </div>
   );
-
 }

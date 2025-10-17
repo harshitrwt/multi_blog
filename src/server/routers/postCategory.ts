@@ -1,14 +1,18 @@
 import { z } from "zod";
 import { router, publicProcedure } from "../trpc";
-import { categories, postCategories } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { postCategories } from "@/lib/schema";
+import { eq, and } from "drizzle-orm";
 
 export const postCategoryRouter = router({
   assign: publicProcedure
-    .input(z.object({ postId: z.number(), categoryId: z.number() }))
+    .input(z.object({ postId: z.number(), categoryIds: z.array(z.number()) }))
     .mutation(async ({ input, ctx }) => {
-      const [postCategory] = await ctx.db.insert(postCategories).values(input).returning();
-      return postCategory;
+      const records = input.categoryIds.map((id) => ({
+        postId: input.postId,
+        categoryId: id,
+      }));
+      await ctx.db.insert(postCategories).values(records);
+      return { success: true };
     }),
 
   getByPost: publicProcedure
@@ -23,11 +27,9 @@ export const postCategoryRouter = router({
   remove: publicProcedure
     .input(z.object({ postId: z.number(), categoryId: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db
+      await ctx.db
         .delete(postCategories)
-        .where(
-          eq(postCategories.postId, input.postId)
-          && eq(postCategories.categoryId, input.categoryId)
-        );
+        .where(and(eq(postCategories.postId, input.postId), eq(postCategories.categoryId, input.categoryId)));
+      return { success: true };
     }),
 });

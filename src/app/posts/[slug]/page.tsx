@@ -32,6 +32,9 @@ export default function PostPage() {
   const handleBackClick = () => {
     router.push(`/`);
   };
+  const handleSeeClick = () => {
+    router.push(`/user`);
+  };
 
   if (isLoading) return <p className="text-center py-10">Loading post...</p>;
   if (error)
@@ -44,7 +47,7 @@ export default function PostPage() {
 
   const cover =
     (post as any).coverImage ||
-    "https://www.eslecollege.com/wp-content/uploads/2022/06/blog-post.png";
+    "../cover.jpg";
 
   return (
     <article className="max-w-3xl mx-auto px-4 py-12">
@@ -85,6 +88,12 @@ export default function PostPage() {
         className="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg shadow-lg"
       >
         Edit
+      </button>
+      <button
+        onClick={handleSeeClick}
+        className="fixed top-5 right-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg shadow-lg"
+      >
+        See Post
       </button>
       <button
         onClick={handleBackClick}

@@ -1,12 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { PostCard } from "@/components/PostCard";
 import { trpc } from "@/lib/trpcClient";
 import { useUIStore } from "../store/uiStore";
 
@@ -17,14 +16,13 @@ export default function DashboardPage() {
   const { user, isLoaded } = useUser();
   const username = isLoaded ? user?.firstName || user?.username || "Blogger" : "Blogger";
 
-  // editor local state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [slug, setSlug] = useState("");
-  const [coverImage, setCoverImage] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<number | "">("");
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [newCategoryModal, setNewCategoryModal] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
 
-  // UI store
   const sidebarOpen = useUIStore((s) => s.sidebarOpen);
   const openSidebar = useUIStore((s) => s.openSidebar);
   const closeSidebar = useUIStore((s) => s.closeSidebar);
@@ -32,38 +30,39 @@ export default function DashboardPage() {
   const hideToast = useUIStore((s) => s.hideToast);
   const toast = useUIStore((s) => s.toast);
 
-  // TRPC queries + mutations
+  const utils = trpc.useContext();
   const { data: categories = [] } = trpc.category.getAll.useQuery();
   const { data: posts = [] } = trpc.post.getAll.useQuery();
-  const utils = trpc.useContext();
 
   const createCategory = trpc.category.create.useMutation({
     onSuccess: () => {
       utils.category.getAll.invalidate();
       showToast("Category created");
-      setTimeout(hideToast, 2500);
+      setTimeout(hideToast, 2000);
+      setNewCategoryName("");
+      setNewCategoryModal(false);
     },
   });
 
   const createPost = trpc.post.create.useMutation({
     onSuccess: (created) => {
       utils.post.getAll.invalidate();
-      showToast("Post created");
+      showToast(created.published ? "Post Published" : "Saved as Draft");
       setTitle("");
       setContent("");
       setSlug("");
-      setCoverImage("");
-      setSelectedCategory("");
+      setSelectedCategories([]);
       setTimeout(() => {
         hideToast();
         router.push("/user");
-      }, 1200);
+      }, 1000);
     },
   });
 
-  
-  const handleCreateCategory = (name: string) => {
-    const s = name.trim().toLowerCase().replace(/\s+/g, "-");
+  const handleCreateCategory = () => {
+    const name = newCategoryName.trim();
+    if (!name) return;
+    const s = name.toLowerCase().replace(/\s+/g, "-");
     createCategory.mutate({ name, slug: s });
   };
 
@@ -74,7 +73,6 @@ export default function DashboardPage() {
       <header className="px-6 py-6 mt-16 max-w-6xl mx-auto w-full flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-extrabold text-blue-600 flex items-center gap-3">
-            
             Hi {username} <span className="text-4xl">👋</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -84,12 +82,8 @@ export default function DashboardPage() {
       </header>
 
       <main className="flex-1 max-w-6xl mx-auto px-6 py-8 w-full grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-8">
-        
         <section className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-blue-600">New Post</h2>
-            
-          </div>
+          <h2 className="text-xl font-semibold text-blue-600 mb-4">New Post</h2>
 
           <input
             value={title}
@@ -98,65 +92,93 @@ export default function DashboardPage() {
             className="w-full mb-4 p-3 rounded-lg border focus:ring-2 focus:ring-blue-400"
           />
 
-          <div className="mb-3 grid grid-cols-1 lg:grid-cols-3 gap-3">
-            <input
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              placeholder="Slug (url-friendly)"
-              className="p-2 rounded-lg border col-span-2"
-            />
-            <input
-              value={coverImage}
-              onChange={(e) => setCoverImage(e.target.value)}
-              placeholder="Cover image URL (optional)"
-              className="p-2 rounded-lg border"
-            />
-          </div>
+          <input
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder="Slug (url-friendly)"
+            className="p-2 rounded-lg border w-full mb-3"
+          />
 
-          <div className="mb-3 flex items-center gap-3">
-            <select
-              value={selectedCategory}
-              onChange={(e) =>
-                setSelectedCategory(e.target.value ? Number(e.target.value) : "")
-              }
-              className="p-2 rounded-lg border"
-            >
-              <option value="">Select category</option>
-              {categories.map((c: any) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+          <div className="mb-5">
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">Select Categories</h4>
+
+            <div className="flex flex-wrap gap-2 mb-3">
+              {categories.map((c: any) => {
+                const isSelected = selectedCategories.includes(c.id);
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => {
+                      if (isSelected) {
+                        setSelectedCategories(selectedCategories.filter((id) => id !== c.id));
+                      } else {
+                        setSelectedCategories([...selectedCategories, c.id]);
+                        showToast(`Added category: ${c.name}`);
+                        setTimeout(hideToast, 1000);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded-full border text-sm ${isSelected
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                      }`}
+                  >
+                    {c.name}
+                  </button>
+                );
+              })}
+            </div>
 
             <button
-              onClick={() => {
-                const name = prompt("New category name")?.trim();
-                if (name) handleCreateCategory(name);
-              }}
+              onClick={() => setNewCategoryModal(true)}
               className="px-3 py-2 rounded-lg bg-sky-600 text-white"
             >
-              + Create category
+              + Add category
             </button>
-          </div>
 
-          <div className="mb-4">
-            <div className="rounded-lg overflow-hidden border">
-              <div data-color-mode="light">
-                <MDEditor
-                  value={content}
-                  onChange={(v) => setContent(v || "")}
-                  height={520}
-                  preview="edit"
-                />
+            {selectedCategories.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {selectedCategories.map((id) => {
+                  const c = categories.find((x: any) => x.id === id);
+                  return (
+                    <span
+                      key={id}
+                      className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium"
+                    >
+                      {c?.name}
+                    </span>
+                  );
+                })}
               </div>
+            )}
+          </div>
+
+          <div className="mb-4 border rounded-lg overflow-hidden">
+            <div data-color-mode="light">
+              <MDEditor
+                value={content}
+                onChange={(v) => setContent(v || "")}
+                height={520}
+                preview="edit"
+              />
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
-            <div className="text-sm text-muted-foreground">
-              Tip: Use markdown. Add images with `![](https://...)`.
-            </div>
+          <div className="flex items-center justify-end gap-3">
+            <button
+              onClick={() =>
+                createPost.mutate({
+                  title,
+                  content,
+                  slug,
+                  categoryIds: selectedCategories,
+                  published: false,
+                })
+              }
+              disabled={!title.trim() || !content.trim()}
+              className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg"
+            >
+              Save Draft
+            </button>
 
             <button
               onClick={() =>
@@ -164,7 +186,8 @@ export default function DashboardPage() {
                   title,
                   content,
                   slug,
-                  categoryId: selectedCategory === "" ? undefined : Number(selectedCategory),
+                  categoryIds: selectedCategories,
+                  published: true,
                 })
               }
               disabled={
@@ -173,30 +196,19 @@ export default function DashboardPage() {
                 !content.trim() ||
                 !slug.trim()
               }
-              className={`inline-flex items-center gap-2 px-5 py-3 rounded-lg text-white font-semibold ${
-                createPost.status === "pending" ? "bg-blue-400 cursor-wait" : "bg-blue-600 hover:bg-blue-700"
-              }`}
+              className={`inline-flex items-center gap-2 px-5 py-3 rounded-lg text-white font-semibold ${createPost.status === "pending"
+                  ? "bg-blue-400 cursor-wait"
+                  : "bg-blue-600 hover:bg-blue-700"
+                }`}
             >
-              {createPost.status === "pending" ? (
-                <>
-                  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" className="opacity-30" />
-                    <path d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" fill="white" />
-                  </svg>
-                  Saving...
-                </>
-              ) : (
-                "Post"
-              )}
+              {createPost.status === "pending" ? "Saving..." : "Publish"}
             </button>
           </div>
         </section>
 
-        
         <aside
-          className={`bg-white dark:bg-neutral-900 rounded-2xl p-4 shadow transition-all ${
-            sidebarOpen ? "block" : "hidden lg:block"
-          }`}
+          className={`bg-white dark:bg-neutral-900 rounded-2xl p-4 shadow transition-all ${sidebarOpen ? "block" : "hidden lg:block"
+            }`}
         >
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-lg font-semibold">Your Posts</h3>
@@ -208,12 +220,15 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          <div className="space-y-3 max-h-[60vh] overflow">
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto">
             {posts.length === 0 ? (
               <div className="text-sm text-muted-foreground">No posts yet.</div>
             ) : (
               posts.map((p: any) => (
-                <div key={p.id} className="p-3 cursor-pointer rounded-lg border hover:border-blue-600">
+                <div
+                  key={p.id}
+                  className="p-3 cursor-pointer rounded-lg border hover:border-blue-600"
+                >
                   <a href={`/posts/${p.slug}`} className="font-medium text-blue-600">
                     {p.title}
                   </a>
@@ -229,6 +244,35 @@ export default function DashboardPage() {
 
       <Footer />
 
+   
+      {newCategoryModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-xl w-80">
+            <h3 className="text-lg font-semibold mb-4 text-center">Add New Category</h3>
+            <input
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="Category name"
+              className="w-full mb-4 p-2 rounded-lg border"
+            />
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setNewCategoryModal(false)}
+                className="px-3 py-1 rounded bg-gray-300 dark:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateCategory}
+                className="px-3 py-1 rounded bg-blue-600 text-white"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {toast.show && (
         <div className="fixed right-6 top-6 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg">
           {toast.message}
@@ -237,5 +281,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { ModeToggle } from "@/components/ModeToggle";
 
-// Helper to scroll to section with id and offset
 function scrollToSection(id: string, offset: number = 0) {
   const section = document.getElementById(id);
   if (section) {
@@ -20,7 +19,6 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleScroll = (section: 'about' | 'features') => {
-    // Adjust offset based on desired scroll position for section
     if (section === 'about') scrollToSection('about-section', -70);
     if (section === 'features') scrollToSection('features-section', -100);
     setIsMenuOpen(false);

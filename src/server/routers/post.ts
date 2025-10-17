@@ -1,110 +1,149 @@
-import { publicProcedure, router } from "@/server/trpc";
-import { db } from "@/server/db";
-import { posts, categories } from "@/lib/schema";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { router, publicProcedure } from "../trpc";
+import { eq, inArray } from "drizzle-orm";
+import { posts, postCategories, categories } from "@/lib/schema";
 
 export const postRouter = router({
-  getAll: publicProcedure.query(async () => {
-    const allPosts = await db
-      .select({
-        id: posts.id,
-        title: posts.title,
-        slug: posts.slug,
-        content: posts.content,
-        createdAt: posts.createdAt,
-        published: posts.published,
-        categoryId: categories.id,
-        categoryName: categories.name,
-        categorySlug: categories.slug,
-      })
-      .from(posts)
-      .leftJoin(categories, eq(posts.categoryId, categories.id));
-
-    return allPosts.map((p) => ({
-      id: p.id,
-      title: p.title,
-      slug: p.slug,
-      content: p.content,
-      createdAt: p.createdAt,
-      published: p.published,
-      category: p.categoryName
-        ? {
-          id: p.categoryId,
-          name: p.categoryName,
-          slug: p.categorySlug,
-        }
-        : null,
-    }));
-  }),
-
+  // CREATE POST
   create: publicProcedure
     .input(
       z.object({
         title: z.string(),
         slug: z.string(),
         content: z.string(),
-        categoryId: z.number().optional(),
+        categoryIds: z.array(z.number()).optional(),
+        published: z.boolean().default(false),
+        authorId: z.string().optional(),
       })
-
     )
-    .mutation(async ({ input }) => {
-      const [inserted] = await db
-        .insert(posts)
-        .values({
-          title: input.title,
-          slug: input.slug,
-          categoryId: input.categoryId ?? null,
-          content: input.content,
-        })
-        .returning();
+    .mutation(async ({ ctx, input }) => {
+      const { categoryIds = [], ...data } = input;
 
-      return inserted;
+      const [created] = await ctx.db.insert(posts).values({
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }).returning();
+
+      if (categoryIds.length > 0) {
+        await ctx.db.insert(postCategories).values(
+          categoryIds.map((cid) => ({
+            postId: created.id,
+            categoryId: cid,
+          }))
+        );
+      }
+
+      return created;
     }),
 
+  // UPDATE POST
   update: publicProcedure
     .input(
       z.object({
-        slug: z.string(),
+        id: z.number(),
         title: z.string(),
+        slug: z.string(),
         content: z.string(),
+        categoryIds: z.array(z.number()).optional(),
+        published: z.boolean().optional(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      const { slug, title, content } = input;
+    .mutation(async ({ ctx, input }) => {
+      const { id, categoryIds, ...data } = input;
+
       const [updated] = await ctx.db
         .update(posts)
-        .set({ title, content })
-        .where(eq(posts.slug, slug))
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(posts.id, id))
         .returning();
+
+      if (categoryIds) {
+        await ctx.db.delete(postCategories).where(eq(postCategories.postId, id));
+        if (categoryIds.length > 0) {
+          await ctx.db.insert(postCategories).values(
+            categoryIds.map((cid) => ({
+              postId: id,
+              categoryId: cid,
+            }))
+          );
+        }
+      }
+
       return updated;
     }),
 
+  // GET ALL POSTS
+  getAll: publicProcedure
+    .input(z.object({ categoryId: z.number().optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      if (input?.categoryId) {
+        const postIds = await ctx.db
+          .select({ postId: postCategories.postId })
+          .from(postCategories)
+          .where(eq(postCategories.categoryId, input.categoryId));
 
+        const ids = postIds.map((p) => p.postId);
+        if (!ids.length) return [];
 
+        return ctx.db
+          .select()
+          .from(posts)
+          .where(inArray(posts.id, ids))
+          .orderBy(posts.createdAt);
+      }
+
+      return ctx.db.select().from(posts).orderBy(posts.createdAt);
+    }),
+
+  // get by slug 
   getBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ ctx, input }) => {
-      const post = await ctx.db.query.posts.findFirst({
-        where: eq(posts.slug, input.slug),
-        with: {
-          postCategories: {
-            with: {
-              category: true,
-            },
-          },
-        },
-      }) as any;
+      const [post] = await ctx.db
+        .select()
+        .from(posts)
+        .where(eq(posts.slug, input.slug));
 
       if (!post) return null;
 
-      const category = post.postCategories?.[0]?.category || null;
+      // categories
+      const categories = await ctx.db
+        .select({
+          id: postCategories.categoryId,
+        })
+        .from(postCategories)
+        .where(eq(postCategories.postId, post.id));
 
-      return {
-        ...post,
-        category,
-      };
+      return { ...post, categories };
+    }),
+
+
+  
+  getByCategory: publicProcedure
+    .input(z.object({ categoryId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const postIds = await ctx.db
+        .select({ postId: postCategories.postId })
+        .from(postCategories)
+        .where(eq(postCategories.categoryId, input.categoryId));
+
+      const ids = postIds.map((p) => p.postId);
+      if (!ids.length) return [];
+
+      return ctx.db
+        .select()
+        .from(posts)
+        .where(inArray(posts.id, ids))
+        .orderBy(posts.createdAt);
+    }),
+
+  // DELETE 
+  delete: publicProcedure
+    .input(z.object({ postId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.delete(postCategories).where(eq(postCategories.postId, input.postId));
+      await ctx.db.delete(posts).where(eq(posts.id, input.postId));
+      return true;
     }),
 });
-
-

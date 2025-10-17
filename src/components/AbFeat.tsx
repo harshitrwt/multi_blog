@@ -53,16 +53,14 @@ export function AboutFeaturesSection() {
         </div>
 
         <div
-          className={`flex-1 max-w-md md:max-w-lg rounded-lg overflow-hidden rotate-12 hover:rotate-0 shadow-lg shadow-white hover:shadow-blue-600 transition-transform duration-700 ease-out ${
+          className={`flex-1 max-w-md md:max-w-md rounded-lg overflow-hidden rotate-12 hover:rotate-0 shadow-lg shadow-white hover:shadow-blue-600 transition-transform duration-700 ease-out ${
             loaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
           <img
             src="https://assets-cdn.wellhub.com/images/mep-cms/legacy_estee_janssens_hf5xg_X_Bfx5_Y_unsplash_scaled_e0b4a18d18.jpg?w=1024&q=70"
             alt="Blogging Inspiration"
-            width={600}
-            height={300}
-            className="object rounded-lg cursor-pointer border-4 border-blue-600 shadow-3xl shadow-white dark:shadow-white"
+            className="object rounded-xl cursor-pointer border-4 border-blue-600 shadow-3xl shadow-white dark:shadow-white"
           />
         </div>
       </div>
