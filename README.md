@@ -22,15 +22,15 @@ It allows users to create, edit, publish, and manage blog posts with rich markdo
 
 ## Features
 
-1. **Markdown Editor** — Rich text creation with live preview powered by `@uiw/react-md-editor`.
-2. **Category Management** — Create and assign multiple categories to posts dynamically.
-3. **Draft & Publish Modes** — Save posts as drafts or publish instantly with toast notifications.
-4. **Filtering by Category** — View posts or drafts filtered by selected categories.
-5. **User Dashboard** — Authenticated users can create, edit, and manage posts.
-6. **Persistent Database** — Drizzle ORM schema synced with Neon PostgreSQL.
-7. **Instant Feedback** — Toast notifications for CRUD actions via Zustand.
-8. **Fully Typed API** — End-to-end type safety using tRPC and Zod.
-9. **Responsive Design** — Mobile-first UI with Tailwind CSS and a toggleable sidebar.
+1. **Markdown Editor**- Rich text creation with live preview powered by `@uiw/react-md-editor`.
+2. **Category Management**- Create and assign multiple categories to posts dynamically.
+3. **Draft & Publish Modes**- Save posts as drafts or publish instantly with toast notifications.
+4. **Filtering by Category**- View posts or drafts filtered by selected categories.
+5. **User Dashboard**- Authenticated users can create, edit, and manage posts.
+6. **Persistent Database**- Drizzle ORM schema synced with Neon PostgreSQL.
+7. **Instant Feedback**- Toast notifications for CRUD actions via Zustand.
+8. **Fully Typed API**- End-to-end type safety using tRPC and Zod.
+9. **Responsive Design**- Mobile-first UI with Tailwind CSS and a toggleable sidebar.
 
 ---
 
@@ -41,16 +41,16 @@ It allows users to create, edit, publish, and manage blog posts with rich markdo
 - **categories** → stores available categories
 - **post_categories** → junction table linking posts and categories (many-to-many relationship)
 
-Example schema snippet:
+Example schema snippet-
 ```ts
 export const posts = pgTable("posts", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  slug: text("slug").unique().notNull(),
-  content: text("content").notNull(),
-  published: boolean("published").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  id- serial("id").primaryKey(),
+  title- text("title").notNull(),
+  slug- text("slug").unique().notNull(),
+  content- text("content").notNull(),
+  published- boolean("published").default(false),
+  createdAt- timestamp("created_at").defaultNow(),
+  updatedAt- timestamp("updated_at").defaultNow(),
 });
 ```
 
@@ -60,7 +60,7 @@ export const posts = pgTable("posts", {
 ### Clone Repository
 
 ```
-git clone https://github.com/yourusername/blogify.git
+git clone https-//github.com/yourusername/blogify.git
 cd blogNest
 ```
 
@@ -90,7 +90,7 @@ Run Development Server
 
 
 Access App
-Visit → http://localhost:3000
+Visit → http-//localhost-3000
 
 ## Key Implementation Highlights
 
