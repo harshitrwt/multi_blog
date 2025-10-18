@@ -37,9 +37,9 @@ It allows users to create, edit, publish, and manage blog posts with rich markdo
 
 ## Database Schema (Drizzle ORM)
 
-- **posts** → stores blog data (title, slug, content, published status, timestamps)
-- **categories** → stores available categories
-- **post_categories** → junction table linking posts and categories (many-to-many relationship)
+- **posts**- stores blog data (title, slug, content, published status, timestamps)
+- **categories**- stores available categories
+- **post_categories**- junction table linking posts and categories (many-to-many relationship)
 
 Example schema snippet-
 ```ts
